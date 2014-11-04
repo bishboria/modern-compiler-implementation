@@ -39,6 +39,8 @@ and maxargsexplist (es : exp list) =
 
 val printStmInProg = maxargs(prog)
 
+fun fst (a, b) = a;
+
 type table = (id * int) list
 
 fun lookup(t:table, i:id) : int =
@@ -55,14 +57,13 @@ fun interp (s:stm) : table =
             case s of
                 CompoundStm (s1, s2) => interpStm(s2, interpStm(s1, t))
               | AssignStm (i, e)     => let val (v, t') = interpExp(e, t)
-                                        in  (*print(makestring v);*)
-                                            print("Assigning: " ^ i ^ "\n");
+                                        in
                                             update(i, v, t')
                                         end
               | PrintStm (e :: es)   => let val (v, t') = interpExp(e, t)
-                                            val exps    = List.map (fn x => interpExp(x, t')) es;
-                                        in  (* print v; how to print an int? *)
-                                            print "PrintVal\n";
+                                            val vals    = List.map (fn x => fst (interpExp(x, t'))) (e :: es);
+                                        in
+                                            List.map (fn x => print("Printing: " ^ Int.toString x ^ "\n")) vals;
                                             t'
                                         end
               | PrintStm nil         => t
